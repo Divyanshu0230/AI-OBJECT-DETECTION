@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Object Detection - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-header {
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #333;
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .login-header p {
+            color: #666;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .mode-btn:not(.active) {
+            color: #666;
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: #e9ecef;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .demo-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .demo-info h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .demo-info p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            margin: 10px 0;
+        }
+
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .confirm-password-group {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1><i class="fas fa-robot"></i> AI Object Detection</h1>
+            <p id="headerText">Sign in to access the application</p>
+        </div>
+
+        <div class="mode-toggle">
+            <button type="button" class="mode-btn active" id="signinBtn">Sign In</button>
+            <button type="button" class="mode-btn" id="signupBtn">Sign Up</button>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
+
+            <div class="form-group confirm-password-group" id="confirmPasswordGroup">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password">
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn">
+                <span id="loginText">Sign In</span>
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                </div>
+            </button>
+        </form>
+
+        <!-- Remove the demo-info box -->
+    </div>
+
+    <script>
+        // Set your Render backend URL here
+        const API_BASE_URL = window.location.hostname === "localhost"
+          ? ""
+          : "https://YOUR-BACKEND-RENDER-URL.onrender.com"; // TODO: Replace with your actual Render backend URL
+
+        let currentMode = 'signin';
+
+        // Mode toggle functionality
+        document.getElementById('signinBtn').addEventListener('click', function() {
+            setMode('signin');
+        });
+
+        document.getElementById('signupBtn').addEventListener('click', function() {
+            setMode('signup');
+        });
+
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Update button states
+            document.getElementById('signinBtn').classList.toggle('active', mode === 'signin');
+            document.getElementById('signupBtn').classList.toggle('active', mode === 'signup');
+            
+            // Update form elements
+            const headerText = document.getElementById('headerText');
+            const loginText = document.getElementById('loginText');
+            const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            
+            if (mode === 'signin') {
+                headerText.textContent = 'Sign in to access the application';
+                loginText.textContent = 'Sign In';
+                confirmPasswordGroup.style.display = 'none';
+                confirmPasswordInput.removeAttribute('required');
+            } else {
+                headerText.textContent = 'Create a new account';
+                loginText.textContent = 'Sign Up';
+                confirmPasswordGroup.style.display = 'block';
+                confirmPasswordInput.setAttribute('required', 'required');
+            }
+            
+            // Clear messages
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const loginText = document.getElementById('loginText');
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+
+            // Hide previous messages
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+
+            // Validate signup
+            if (currentMode === 'signup') {
+                if (password !== confirmPassword) {
+                    errorMessage.textContent = 'Passwords do not match';
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    errorMessage.textContent = 'Password must be at least 6 characters long';
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+            }
+
+            // Show loading
+            loginBtn.disabled = true;
+            loginText.style.display = 'none';
+            loading.style.display = 'block';
+
+            try {
+                console.log('Attempting', currentMode, 'with:', { username, password: '***' });
+                
+                const endpoint = currentMode === 'signin' ? '/api/login' : '/api/signup';
+                
+                const response = await fetch(API_BASE_URL + endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (response.ok) {
+                    // Store auth token
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('username', username);
+                    
+                    // Show success message
+                    const successMsg = currentMode === 'signin' ? 'Login successful! Redirecting...' : 'Account created successfully! Redirecting...';
+                    successMessage.textContent = successMsg;
+                    successMessage.style.display = 'block';
+                    
+                    // Redirect to main app
+                    setTimeout(() => {
+                        window.location.href = '/index.html';
+                    }, 1000);
+                } else {
+                    throw new Error(data.message || data.error || `${currentMode === 'signin' ? 'Login' : 'Signup'} failed`);
+                }
+            } catch (error) {
+                console.error(currentMode, 'error:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack
+                });
+                
+                errorMessage.textContent = error.message || `${currentMode === 'signin' ? 'Login' : 'Signup'} failed. Please try again.`;
+                errorMessage.style.display = 'block';
+            } finally {
+                // Hide loading
+                loginBtn.disabled = false;
+                loginText.style.display = 'block';
+                loading.style.display = 'none';
+            }
+        });
+
+        // Check if user is already logged in
+        window.addEventListener('load', function() {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                // User is already logged in, redirect to main app
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+</html> 

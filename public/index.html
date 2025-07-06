@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Object Detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/ml5@0.12.2/dist/ml5.min.js"></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h2 id="loadingText">Initializing AI Object Detection...</h2>
+            <p>Please wait while we load the AI model and camera</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1><i class="fas fa-brain"></i>AI Object Detection</h1>
+            <div class="header-controls">
+                <button class="btn btn-secondary" id="capturesBtn">
+                    <i class="fas fa-images"></i> Captures
+                </button>
+                <button class="btn btn-secondary" id="statsBtn">
+                    <i class="fas fa-chart-bar"></i> Stats
+                </button>
+                <button class="btn btn-secondary" id="historyBtn">
+                    <i class="fas fa-history"></i> History
+                </button>
+                <button class="btn btn-danger" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Camera Section -->
+            <section class="camera-section">
+                <div class="video-container">
+                    <video id="video" playsinline autoplay muted></video>
+                    <canvas id="c1" class="detection-canvas"></canvas>
+                    <div class="camera-overlay">
+                        <div class="camera-status">
+                            <div id="cameraStatus" class="status-indicator">
+                                <i class="fas fa-camera"></i> Initializing Camera...
+                            </div>
+                            <div id="aiStatus" class="status-indicator">
+                                <i class="fas fa-brain"></i> Loading AI...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Controls Section -->
+            <section class="controls-section">
+                <!-- AI Control -->
+                <div class="control-card">
+                    <h3><i class="fas fa-brain"></i> AI Detection</h3>
+                    <div class="control-group">
+                        <label class="control-label">Enable AI Detection</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="ai" disabled>
+                            <label for="ai" class="toggle-label">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Confidence: <span id="confidenceValue">35%</span></label>
+                        <input type="range" id="confidence" min="10" max="90" value="35" class="slider">
+                    </div>
+                </div>
+
+                <!-- Performance Control -->
+                <div class="control-card">
+                    <h3><i class="fas fa-tachometer-alt"></i> Performance</h3>
+                    <div class="control-group">
+                        <label class="control-label">FPS: <span id="fpsValue">16</span></label>
+                        <input type="range" id="fps" min="1" max="30" value="16" class="slider">
+                    </div>
+                    <div class="control-group">
+                        <button class="btn btn-primary" id="captureBtn">
+                            <i class="fas fa-camera"></i> Capture Detection
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Detection Info -->
+                <div class="control-card">
+                    <h3><i class="fas fa-info-circle"></i> Detection Info</h3>
+                    <div id="detectionInfo" class="detection-info">
+                        <p>Enable AI detection to see real-time object detection information.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Stats Modal -->
+    <div id="statsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-chart-bar"></i> Detection Statistics</h2>
+                <button class="close-btn" data-modal="statsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="statsContent">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Total Detections</h3>
+                            <p id="totalDetections">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Objects Detected</h3>
+                            <p id="totalObjects">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Average Confidence</h3>
+                            <p id="avgConfidence">0%</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Session Duration</h3>
+                            <p id="sessionDuration">0:00</p>
+                        </div>
+                    </div>
+                    <div class="popular-objects">
+                        <h3>Most Detected Objects</h3>
+                        <div id="popularObjectsList">
+                            <p>No data available yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-history"></i> Detection History</h2>
+                <button class="close-btn" data-modal="historyModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="historyContent">
+                    <div class="history-list" id="historyList">
+                        <p>No detection history available yet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Captures Modal -->
+    <div id="capturesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-images"></i> Captured Detections</h2>
+                <button class="close-btn" data-modal="capturesModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="capturesList" class="captures-list">
+                    <p>Loading captures...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html> 
