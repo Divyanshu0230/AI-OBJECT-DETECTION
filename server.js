@@ -159,14 +159,8 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-// Redirect root to login if not authenticated
+// Serve index.html at root (no auth check)
 app.get('/', (req, res) => {
-    const token = req.cookies?.authToken || req.query.token;
-    
-    if (!token || !verifyToken(token)) {
-        return res.redirect('/login');
-    }
-    
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
@@ -374,7 +368,7 @@ app.use((err, req, res, next) => {
 
 // 404 handler
 app.use((req, res) => {
-    res.status(404).json({ error: 'Route not found' });
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start server
