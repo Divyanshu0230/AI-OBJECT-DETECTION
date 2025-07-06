@@ -26,48 +26,41 @@ AI Object Detection is a real-time, web-based application that uses machine lear
 ---
 
 ## 🏗️ System Architecture
-**High-level overview of the application flow:**
+**High-level overview:**
 
-```mermaid
-graph TD
-  User[User (Browser)]
-  Frontend[Frontend (HTML/JS/CSS, ml5.js)]
-  Backend[Backend (Node.js/Express)]
-  DB[(MongoDB Atlas)]
+The system is composed of four main parts:
+1. **User (Browser):** The end user interacts with the application through a modern web browser, which accesses the device camera for real-time video streaming.
+2. **Frontend (HTML/JS/CSS, ml5.js):** The frontend is a single-page web app that handles the user interface, camera access, and runs the COCO-SSD object detection model in the browser using ml5.js. It also manages authentication, statistics, and history display.
+3. **Backend (Node.js/Express):** The backend is a Node.js server using Express. It serves the frontend files, provides REST API endpoints for authentication, detections, stats, and captures, and manages user sessions and security.
+4. **Database (MongoDB Atlas):** User data (such as email and hashed password) is securely stored in a managed MongoDB Atlas database. Detection and capture data is managed in-memory for demo purposes but can be extended to persistent storage.
 
-  User --> Frontend
-  Frontend --> Backend
-  Backend --> DB
-```
+**Data Flow:**
+- The user’s browser streams video to the frontend, which performs AI detection locally.
+- The frontend communicates with the backend via API calls for login, signup, stats, and history.
+- The backend interacts with MongoDB for user management and can be extended for persistent detection/capture storage.
 
 ---
 
 ## 🏛️ System Design
 **Main modules and their relationships:**
 
-```mermaid
-graph TD
-  UI[UI (HTML/CSS/JS)]
-  ML[ml5.js (COCO-SSD)]
-  Camera[Camera Access]
-  APIClient[API Client]
-  Express[Express Server]
-  Auth[Auth Module]
-  Detect[Detection API]
-  Stats[Stats/History API]
-  Mongo[MongoDB Client]
+- **Frontend Modules:**
+  - **UI (HTML/CSS/JS):** Handles all user interactions, forms, and display of detection results, stats, and history.
+  - **ml5.js (COCO-SSD):** Runs the object detection model in the browser for real-time inference on video frames.
+  - **Camera Access:** Uses browser APIs to access the device camera and stream video to the detection model.
+  - **API Client:** Handles all HTTP requests to the backend for authentication, detections, stats, and captures.
 
-  UI --> ML
-  UI --> Camera
-  UI --> APIClient
-  APIClient --> Express
-  Express --> Auth
-  Express --> Detect
-  Express --> Stats
-  Auth --> Mongo
-  Detect --> Mongo
-  Stats --> Mongo
-```
+- **Backend Modules:**
+  - **Express Server:** Serves static frontend files and exposes REST API endpoints.
+  - **Auth Module:** Manages user signup, login, password hashing, and token generation/validation.
+  - **Detection API:** Receives detection/capture data from the frontend and manages in-memory storage (can be extended to DB).
+  - **Stats/History API:** Provides endpoints for retrieving user-specific statistics and detection/capture history.
+  - **MongoDB Client:** Handles all interactions with the MongoDB Atlas database for user data.
+
+**Component Relationships:**
+- The UI interacts with ml5.js for detection and with the API Client for backend communication.
+- The API Client sends requests to the Express server, which routes them to the appropriate backend modules.
+- The backend modules interact with MongoDB for persistent user data and can be extended for full detection/capture persistence.
 
 ---
 
