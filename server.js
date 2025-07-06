@@ -36,10 +36,10 @@ MongoClient.connect(MONGODB_URI, { useUnifiedTopology: true })
     console.error('❌ MongoDB connection error:', err);
   });
 
-// Update generateToken and verifyToken to use role from DB
-function generateToken(username, role) {
+// Update generateToken and verifyToken to use email from DB
+function generateToken(email, role) {
     const payload = {
-        username: username,
+        email: email,
         timestamp: Date.now(),
         role: role
     };
@@ -81,39 +81,39 @@ function requireAuth(req, res, next) {
 
 // Signup endpoint (MongoDB)
 app.post('/api/signup', async (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password are required' });
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required' });
     }
-    if (username.length < 3) {
-        return res.status(400).json({ error: 'Username must be at least 3 characters long' });
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        return res.status(400).json({ error: 'Invalid email address' });
     }
     if (password.length < 6) {
         return res.status(400).json({ error: 'Password must be at least 6 characters long' });
     }
     try {
         // Check if user exists
-        const existing = await usersCollection.findOne({ username });
+        const existing = await usersCollection.findOne({ email });
         if (existing) {
-            return res.status(409).json({ error: 'Username already exists' });
+            return res.status(409).json({ error: 'Email already exists' });
         }
         // Hash password
         const hashed = await bcrypt.hash(password, 10);
         const userDoc = {
-            username,
+            email,
             password: hashed,
             role: 'user',
             createdAt: new Date()
         };
         await usersCollection.insertOne(userDoc);
-        console.log(`✅ New user registered: ${username}`);
-        const token = generateToken(username, 'user');
+        console.log(`✅ New user registered: ${email}`);
+        const token = generateToken(email, 'user');
         res.cookie('authToken', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             maxAge: 24 * 60 * 60 * 1000
         });
-        res.json({ success: true, token, user: { username, role: 'user' } });
+        res.json({ success: true, token, user: { email, role: 'user' } });
     } catch (err) {
         console.error('Signup error:', err);
         res.status(500).json({ error: 'Signup failed' });
@@ -122,26 +122,26 @@ app.post('/api/signup', async (req, res) => {
 
 // Login endpoint (MongoDB)
 app.post('/api/login', async (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password are required' });
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required' });
     }
     try {
-        const user = await usersCollection.findOne({ username });
+        const user = await usersCollection.findOne({ email });
         if (!user) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
-        const token = generateToken(username, user.role);
+        const token = generateToken(email, user.role);
         res.cookie('authToken', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             maxAge: 24 * 60 * 60 * 1000
         });
-        res.json({ success: true, token, user: { username, role: user.role } });
+        res.json({ success: true, token, user: { email, role: user.role } });
     } catch (err) {
         console.error('Login error:', err);
         res.status(500).json({ error: 'Login failed' });
@@ -190,7 +190,7 @@ app.post('/api/detections', requireAuth, (req, res) => {
             sessionId: sessionId,
             deviceInfo: deviceInfo,
             timestamp: new Date(),
-            userId: req.user.username
+            userId: req.user.email
         };
 
         detections.push(detection);
@@ -222,8 +222,8 @@ app.get('/api/stats', requireAuth, (req, res) => {
         const { sessionId } = req.query;
         
         // Filter data for current user
-        const userDetections = detections.filter(detection => detection.userId === req.user.username);
-        const userCaptures = captures.filter(capture => capture.userId === req.user.username);
+        const userDetections = detections.filter(detection => detection.userId === req.user.email);
+        const userCaptures = captures.filter(capture => capture.userId === req.user.email);
         
         const popularObjectsArray = Object.entries(stats.popularObjects)
             .map(([label, count]) => ({ _id: label, count }))
@@ -277,7 +277,7 @@ app.get('/api/detections', requireAuth, (req, res) => {
     try {
         const { sessionId, limit = 20, offset = 0 } = req.query;
         
-        let filteredDetections = detections.filter(d => d.userId === req.user.username);
+        let filteredDetections = detections.filter(d => d.userId === req.user.email);
         
         // Filter by session if provided
         if (sessionId) {
@@ -318,7 +318,7 @@ app.post('/api/captures', requireAuth, (req, res) => {
             sessionId: sessionId,
             deviceInfo: deviceInfo,
             timestamp: new Date(),
-            userId: req.user.username
+            userId: req.user.email
         };
 
         captures.push(capture);
@@ -333,7 +333,7 @@ app.post('/api/captures', requireAuth, (req, res) => {
 // Get captures endpoint
 app.get('/api/captures', requireAuth, (req, res) => {
     try {
-        const userCaptures = captures.filter(capture => capture.userId === req.user.username);
+        const userCaptures = captures.filter(capture => capture.userId === req.user.email);
         res.json(userCaptures);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch captures' });

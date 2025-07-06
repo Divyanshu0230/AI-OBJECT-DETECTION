@@ -741,7 +741,7 @@ async function logout() {
     } finally {
         // Clear local storage
         localStorage.removeItem('authToken');
-        localStorage.removeItem('username');
+        localStorage.removeItem('email');
         
         // Redirect to login
         window.location.href = '/login.html';
