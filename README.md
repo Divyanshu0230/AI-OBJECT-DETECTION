@@ -26,29 +26,72 @@ AI Object Detection is a real-time, web-based application that uses machine lear
 ---
 
 ## 🏗️ System Architecture
+**High-level overview of the application flow:**
 
 ```mermaid
 graph TD;
-  A[User Device/Browser] -->|Camera Stream| B[Frontend (HTML/JS/CSS, ml5.js)]
-  B -->|API Calls| C[Backend (Node.js/Express)]
-  C -->|User Data| D[(MongoDB Atlas)]
-  B -->|Static Files| C
+  User[User (Browser)] -->|Camera Stream| Frontend[Frontend (HTML/JS/CSS, ml5.js)]
+  Frontend -->|API Calls| Backend[Backend (Node.js/Express)]
+  Backend -->|User Data| MongoDB[(MongoDB Atlas)]
+  Frontend -->|Static Files| Backend
+```
+
+---
+
+## 🏛️ System Design
+**Main modules and their relationships:**
+
+```mermaid
+graph LR;
+  subgraph Frontend
+    A1[UI (HTML/CSS/JS)]
+    A2[ml5.js (COCO-SSD)]
+    A3[Camera Access]
+    A4[API Client]
+  end
+  subgraph Backend
+    B1[Express Server]
+    B2[Auth Module]
+    B3[Detection API]
+    B4[Stats/History API]
+    B5[MongoDB Client]
+  end
+  A1 --> A2
+  A1 --> A3
+  A1 --> A4
+  A4 --> B1
+  B1 --> B2
+  B1 --> B3
+  B1 --> B4
+  B2 --> B5
+  B3 --> B5
+  B4 --> B5
 ```
 
 ---
 
 ## 📝 Low Level Design (LLD)
+**Detailed flow for authentication and detection:**
 
-- **Frontend:**
-  - Camera access via browser
-  - Real-time video to canvas
-  - ml5.js COCO-SSD for detection
-  - API calls for login/signup, stats, history, captures
-- **Backend:**
-  - Express routes for `/api/signup`, `/api/login`, `/api/detections`, `/api/captures`, `/api/stats`
-  - JWT-like token for session
-  - MongoDB for user storage
-  - In-memory stats/captures for demo
+```mermaid
+graph TD;
+  subgraph User Flow
+    U1[User: Sign Up / Login]
+    U2[Frontend: Send Email/Password]
+    U3[Backend: Validate & Hash Password]
+    U4[Backend: Store/Retrieve User in MongoDB]
+    U5[Backend: Generate Token]
+    U6[Frontend: Store Token]
+    U7[User: Enable Camera]
+    U8[Frontend: Start Video Stream]
+    U9[Frontend: Run ml5.js Detection]
+    U10[Frontend: Show Results, Call /api/detections]
+    U11[Backend: Save Detection, Update Stats]
+    U12[Frontend: Show Stats/History]
+  end
+  U1 --> U2 --> U3 --> U4 --> U5 --> U6
+  U7 --> U8 --> U9 --> U10 --> U11 --> U12
+```
 
 ---
 
