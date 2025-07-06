@@ -35,10 +35,9 @@ graph TD
   Backend[Backend (Node.js/Express)]
   DB[(MongoDB Atlas)]
 
-  User -->|Camera Stream| Frontend
-  Frontend -->|API Calls| Backend
-  Backend -->|User Data| DB
-  Frontend -->|Static Files| Backend
+  User --> Frontend
+  Frontend --> Backend
+  Backend --> DB
 ```
 
 ---
