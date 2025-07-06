@@ -3,7 +3,7 @@
 // Set your Render backend URL here
 const API_BASE_URL = window.location.hostname === "localhost"
   ? ""
-  : "https://ai-object-detection-app.onrender.com"; // Updated with your Render backend URL
+  : "https://ai-object-detection-9nez.onrender.com"; // Updated with your Render backend URL
 
 // Global variables
 let modelIsLoaded = false;
