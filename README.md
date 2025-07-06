@@ -15,8 +15,8 @@ A real-time AI-powered object detection application using ml5.js, COCO-SSD model
 
 ## 🚀 Live Demo
 
-- **Frontend**: [Your Vercel URL]
-- **Backend**: [Your Render URL]
+- **Frontend**: [Your Vercel URL] (Update after Vercel deployment)
+- **Backend**: https://ai-object-detection-app.onrender.com
 
 ## 🛠️ Tech Stack
 
