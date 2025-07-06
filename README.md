@@ -29,10 +29,15 @@ AI Object Detection is a real-time, web-based application that uses machine lear
 **High-level overview of the application flow:**
 
 ```mermaid
-graph TD;
-  User[User (Browser)] -->|Camera Stream| Frontend[Frontend (HTML/JS/CSS, ml5.js)]
-  Frontend -->|API Calls| Backend[Backend (Node.js/Express)]
-  Backend -->|User Data| MongoDB[(MongoDB Atlas)]
+graph TD
+  User[User (Browser)]
+  Frontend[Frontend (HTML/JS/CSS, ml5.js)]
+  Backend[Backend (Node.js/Express)]
+  DB[(MongoDB Atlas)]
+
+  User -->|Camera Stream| Frontend
+  Frontend -->|API Calls| Backend
+  Backend -->|User Data| DB
   Frontend -->|Static Files| Backend
 ```
 
@@ -42,30 +47,27 @@ graph TD;
 **Main modules and their relationships:**
 
 ```mermaid
-graph LR;
-  subgraph Frontend
-    A1[UI (HTML/CSS/JS)]
-    A2[ml5.js (COCO-SSD)]
-    A3[Camera Access]
-    A4[API Client]
-  end
-  subgraph Backend
-    B1[Express Server]
-    B2[Auth Module]
-    B3[Detection API]
-    B4[Stats/History API]
-    B5[MongoDB Client]
-  end
-  A1 --> A2
-  A1 --> A3
-  A1 --> A4
-  A4 --> B1
-  B1 --> B2
-  B1 --> B3
-  B1 --> B4
-  B2 --> B5
-  B3 --> B5
-  B4 --> B5
+graph TD
+  UI[UI (HTML/CSS/JS)]
+  ML[ml5.js (COCO-SSD)]
+  Camera[Camera Access]
+  APIClient[API Client]
+  Express[Express Server]
+  Auth[Auth Module]
+  Detect[Detection API]
+  Stats[Stats/History API]
+  Mongo[MongoDB Client]
+
+  UI --> ML
+  UI --> Camera
+  UI --> APIClient
+  APIClient --> Express
+  Express --> Auth
+  Express --> Detect
+  Express --> Stats
+  Auth --> Mongo
+  Detect --> Mongo
+  Stats --> Mongo
 ```
 
 ---
