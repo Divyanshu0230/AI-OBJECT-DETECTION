@@ -144,25 +144,4 @@ npm start
 - **Scalable**: Can be containerized, deployed to cloud
 - **Modular**: Frontend and backend can be split if needed
 
----
 
-## 🤝 Contributing
-1. Fork the repo
-2. Create a feature branch
-3. Commit changes
-4. Open a pull request
-
----
-
-## 📄 License
-MIT License
-
----
-
-## 🆘 Support
-- [Open an issue](https://github.com/Divyanshu0230/AI-OBJECT-DETECTION/issues)
-- [Live Demo](https://ai-object-detection-9nez.onrender.com)
-
----
-
-**Built with ❤️ using AI and modern web technologies**
